@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoneyNote – Sổ Chi Tiêu Cá Nhân</title>
+
+    <!-- Google Fonts: Be Vietnam Pro (Yêu cầu đề bài) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bộ icon: Font Awesome 6 (Được phép theo đề bài) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- File CSS chính -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 1. THANH BÊN ĐIỀU HƯỚNG (SIDEBAR - DESKTOP) -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>MoneyNote</h1>
+                    <span>Sổ Chi Tiêu Sinh Viên</span>
+                </div>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-view="dashboard">
+                        <button type="button">
+                            <i class="fa-solid fa-chart-pie"></i>
+                            <span>Tổng quan</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" data-view="transactions">
+                        <button type="button" id="navTransactionsBtn">
+                            <i class="fa-solid fa-receipt"></i>
+                            <span>Giao dịch</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" data-view="budget">
+                        <button type="button" id="navBudgetBtn">
+                            <i class="fa-solid fa-piggy-bank"></i>
+                            <span>Ngân sách</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" data-view="reports">
+                        <button type="button" id="navReportsBtn">
+                            <i class="fa-solid fa-chart-simple"></i>
+                            <span>Thống kê</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <!-- Chuyển đổi giao diện Sáng / Tối (F11) -->
+                <button type="button" class="theme-toggle-btn" id="themeToggleBtn" title="Chuyển chế độ Sáng / Tối">
+                    <span id="themeToggleText"><i class="fa-solid fa-moon"></i> Chế độ tối</span>
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                </button>
+
+                <div class="user-quick-info">
+                    <div class="user-avatar">SV</div>
+                    <div class="user-details">
+                        <div class="user-name">Sinh Viên K18</div>
+                        <div class="user-role">Kế toán cá nhân</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. KHU VỰC NỘI DUNG CHÍNH (MAIN CONTENT) -->
+        <main class="main-wrapper">
+            <!-- HEADER TRÊN CÙNG -->
+            <header class="top-header">
+                <div class="page-title">
+                    <h2>Tổng quan tài chính</h2>
+                    <p>Theo dõi thu chi, kiểm soát ngân sách và thói quen tiêu dùng</p>
+                </div>
+
+                <div class="top-actions">
+                    <!-- Bộ chọn tháng (F01, F07) -->
+                    <div class="month-selector" title="Chọn tháng xem báo cáo">
+                        <button type="button" class="month-nav-btn" id="prevMonthBtn" aria-label="Tháng trước">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <span class="month-display" id="monthDisplay">Tháng 10/2026</span>
+                        <input type="month" id="hiddenMonthInput" class="month-input-hidden">
+                        <button type="button" class="month-nav-btn" id="nextMonthBtn" aria-label="Tháng sau">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Nút Xuất Excel (F12) -->
+                    <button type="button" class="btn-secondary" id="exportCsvBtn" title="Xuất dữ liệu ra file Excel (.csv)">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Xuất Excel</span>
+                    </button>
+
+                    <!-- Nút Thêm giao dịch (F02) -->
+                    <button type="button" class="btn-primary" id="openAddModalBtn">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Thêm giao dịch</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 3 THẺ TỔNG THU - TỔNG CHI - SỐ DƯ (F01) -->
+            <section class="stats-grid">
+                <!-- Thẻ Tổng Thu -->
+                <article class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Tổng thu nhập</span>
+                        <div class="stat-icon income">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value income-val" id="totalIncomeVal">0 ₫</div>
+                    <div class="stat-meta">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span id="incomeCountMeta">0 khoản thu trong tháng</span>
+                    </div>
+                </article>
+
+                <!-- Thẻ Tổng Chi -->
+                <article class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Tổng chi tiêu</span>
+                        <div class="stat-icon expense">
+                            <i class="fa-solid fa-arrow-trend-down"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value expense-val" id="totalExpenseVal">0 ₫</div>
+                    <div class="stat-meta">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span id="expenseCountMeta">0 khoản chi trong tháng</span>
+                    </div>
+                </article>
+
+                <!-- Thẻ Số Dư (Navy #14213D theo quy chuẩn đề bài) -->
+                <article class="stat-card card-balance">
+                    <div class="stat-header">
+                        <span class="stat-label">Số dư hiện tại</span>
+                        <div class="stat-icon balance">
+                            <i class="fa-solid fa-scale-balanced"></i>
+                        </div>
+                    </div>
+                    <div class="stat-value" id="netBalanceVal">0 ₫</div>
+                    <div class="stat-meta">
+                        <span class="badge-balance-status safe" id="balanceStatusBadge">Cân đối tốt</span>
+                        <span id="balanceRatioMeta">Tỷ lệ chi/thu: 0%</span>
+                    </div>
+                </article>
+            </section>
+
+            <!-- KHU VỰC TIẾN ĐỘ NGÂN SÁCH THÁNG (F08) -->
+            <section class="budget-card" id="budgetSection">
+                <div class="budget-top">
+                    <div class="budget-info">
+                        <h3><i class="fa-solid fa-bullseye" style="color: var(--color-primary);"></i> Hạn mức chi tiêu tháng</h3>
+                        <p>Kiểm soát chi tiêu không vượt quá giới hạn đặt ra</p>
+                    </div>
+                    <button type="button" class="btn-budget-edit" id="openBudgetModalBtn">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Cài đặt hạn mức</span>
+                    </button>
+                </div>
+
+                <!-- Thanh tiến độ -->
+                <div class="budget-progress-track">
+                    <div class="budget-progress-bar safe" id="budgetProgressBar"></div>
+                </div>
+
+                <div class="budget-numbers">
+                    <div class="budget-spent">
+                        Đã chi: <strong id="budgetSpentVal">0 ₫</strong> (<span id="budgetPercentVal">0%</span>)
+                    </div>
+                    <div class="budget-limit">
+                        Hạn mức: <strong id="budgetLimitVal">0 ₫</strong>
+                    </div>
+                </div>
+
+                <!-- Banner cảnh báo vượt ngân sách (F08) -->
+                <div class="budget-alert-banner" id="budgetAlertBanner">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="budgetAlertMessage">Cảnh báo ngân sách</span>
+                </div>
+            </section>
+
+            <!-- NỘI DUNG 2 CỘT: DANH SÁCH GIAO DỊCH & BIỂU ĐỒ THỐNG KÊ -->
+            <div class="content-grid">
+                <!-- CỘT 1: DANH SÁCH GIAO DỊCH (F03, F07) -->
+                <section class="transactions-panel" id="transactionsSection">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <h3>Lịch sử giao dịch</h3>
+                            <span class="badge-count" id="txCountBadge">0 giao dịch</span>
+                        </div>
+                    </div>
+
+                    <!-- Thanh tìm kiếm & lọc (F07) -->
+                    <div class="filters-toolbar">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchInput" placeholder="Tìm theo ghi chú, danh mục..." autocomplete="off">
+                        </div>
+
+                        <div class="filter-row">
+                            <!-- Lọc theo loại Thu / Chi -->
+                            <div class="type-filter-group">
+                                <button type="button" class="type-btn active" data-filter-type="all">Tất cả</button>
+                                <button type="button" class="type-btn" data-filter-type="expense">Khoản chi</button>
+                                <button type="button" class="type-btn" data-filter-type="income">Khoản thu</button>
+                            </div>
+
+                            <!-- Lọc theo danh mục -->
+                            <select class="category-filter-select" id="categoryFilterSelect">
+                                <option value="all">Tất cả danh mục</option>
+                            </select>
+
+                            <!-- Lọc theo phương thức thanh toán -->
+                            <select class="payment-filter-select" id="paymentFilterSelect">
+                                <option value="all">Mọi hình thức</option>
+                                <option value="Tiền mặt">Tiền mặt</option>
+                                <option value="Chuyển khoản">Chuyển khoản</option>
+                                <option value="Ví điện tử">Ví điện tử</option>
+                                <option value="Thẻ tín dụng">Thẻ tín dụng</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Danh sách hiển thị giao dịch (F03) -->
+                    <div class="transaction-list" id="transactionList">
+                        <!-- Render động qua JavaScript -->
+                    </div>
+                </section>
+
+                <!-- CỘT 2: THỐNG KÊ CHI THEO DANH MỤC & BIỂU ĐỒ (F09) -->
+                <section class="chart-panel" id="reportsSection">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <h3>Phân bổ chi tiêu</h3>
+                        </div>
+                    </div>
+
+                    <!-- Biểu đồ Donut thuần SVG -->
+                    <div class="chart-container" id="chartContainer">
+                        <svg class="svg-donut-chart" viewBox="0 0 100 100" id="donutSvg">
+                            <!-- Các vòng cung phần trăm render qua JS -->
+                        </svg>
+                        <div class="chart-center-text">
+                            <div class="chart-center-label">Tổng chi</div>
+                            <div class="chart-center-val" id="chartCenterVal">0 ₫</div>
+                        </div>
+                    </div>
+
+                    <!-- Chi tiết từng danh mục (Legend) -->
+                    <div class="category-breakdown" id="categoryBreakdownList">
+                        <!-- Danh sách % render qua JS -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- 3. THANH ĐIỀU HƯỚNG DƯỚI ĐÁY TRÊN ĐIỆN THOẠI (F10) -->
+    <nav class="mobile-bottom-nav">
+        <button type="button" class="mobile-nav-btn active" data-scroll="dashboard">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>Tổng quan</span>
+        </button>
+        <button type="button" class="mobile-nav-btn" data-scroll="transactionsSection">
+            <i class="fa-solid fa-receipt"></i>
+            <span>Giao dịch</span>
+        </button>
+        <button type="button" class="mobile-nav-btn" data-scroll="budgetSection">
+            <i class="fa-solid fa-piggy-bank"></i>
+            <span>Ngân sách</span>
+        </button>
+        <button type="button" class="mobile-nav-btn" data-scroll="reportsSection">
+            <i class="fa-solid fa-chart-simple"></i>
+            <span>Thống kê</span>
+        </button>
+    </nav>
+
+    <!-- Nút thêm giao dịch nổi (FAB) trên Mobile -->
+    <button type="button" class="mobile-fab-btn" id="mobileFabBtn" title="Thêm giao dịch mới">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- ==============================================================================
+         4. CÁC MODAL HỘP THOẠI (FORM THÊM/SỬA, ĐẶT NGÂN SÁCH, XÁC NHẬN XÓA)
+         ============================================================================== -->
+
+    <!-- MODAL THÊM / SỬA GIAO DỊCH (F02, F04) -->
+    <div class="modal-overlay" id="txModalOverlay" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="txModalTitle">Thêm giao dịch mới</h3>
+                <button type="button" class="btn-close-modal" id="closeTxModalBtn" aria-label="Đóng">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="txForm" novalidate>
+                <div class="modal-body">
+                    <!-- Chọn loại Thu / Chi -->
+                    <div class="type-toggle-switch">
+                        <button type="button" class="type-toggle-btn active expense" id="btnTypeExpense" data-type="expense">
+                            <i class="fa-solid fa-arrow-trend-down"></i>
+                            <span>Khoản chi</span>
+                        </button>
+                        <button type="button" class="type-toggle-btn income" id="btnTypeIncome" data-type="income">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                            <span>Khoản thu</span>
+                        </button>
+                    </div>
+
+                    <!-- Ô nhập số tiền lớn -->
+                    <div class="amount-input-group">
+                        <label for="txAmount">Số tiền giao dịch <span style="color: var(--color-expense);">*</span></label>
+                        <div class="amount-box">
+                            <span class="amount-currency">₫</span>
+                            <input type="number" id="txAmount" class="amount-input" placeholder="0" min="1" step="1000" required>
+                        </div>
+                        <span class="form-error" id="amountError">Vui lòng nhập số tiền hợp lệ lớn hơn 0!</span>
+                    </div>
+
+                    <!-- Lưới chọn Danh mục (Category Grid - Yêu cầu đề bài) -->
+                    <div class="category-section">
+                        <label>Chọn danh mục <span style="color: var(--color-expense);">*</span></label>
+                        <div class="category-grid" id="categoryGrid">
+                            <!-- Các ô danh mục có icon render tự động -->
+                        </div>
+                        <span class="form-error" id="categoryError">Vui lòng chọn một danh mục!</span>
+                    </div>
+
+                    <!-- Ngày giao dịch & Phương thức thanh toán -->
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="txDate">Ngày giao dịch <span style="color: var(--color-expense);">*</span></label>
+                            <input type="date" id="txDate" class="form-control" required>
+                            <span class="form-error" id="dateError">Vui lòng chọn ngày hợp lệ!</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="txPaymentMethod">Hình thức thanh toán</label>
+                            <select id="txPaymentMethod" class="form-control">
+                                <option value="Tiền mặt">Tiền mặt</option>
+                                <option value="Chuyển khoản">Chuyển khoản</option>
+                                <option value="Ví điện tử">Ví điện tử (MoMo/ZaloPay)</option>
+                                <option value="Thẻ tín dụng">Thẻ tín dụng / Ghi nợ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Ghi chú giao dịch -->
+                    <div class="form-group">
+                        <label for="txNote">Ghi chú (Tùy chọn)</label>
+                        <input type="text" id="txNote" class="form-control" placeholder="Ví dụ: Ăn trưa bún bò, tiền học phí..." maxlength="100">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelTxBtn">Hủy</button>
+                    <button type="submit" class="btn-primary" id="saveTxBtn">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Lưu giao dịch</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL ĐẶT HẠN MỨC NGÂN SÁCH (F08) -->
+    <div class="modal-overlay" id="budgetModalOverlay" role="dialog" aria-modal="true">
+        <div class="modal-content budget-modal-content">
+            <div class="modal-header">
+                <h3>Cài đặt hạn mức chi tiêu tháng</h3>
+                <button type="button" class="btn-close-modal" id="closeBudgetModalBtn" aria-label="Đóng">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="budgetForm">
+                <div class="modal-body">
+                    <p style="font-size: 13px; color: var(--color-text-sub);">
+                        Thiết lập số tiền tối đa bạn dự định chi tiêu trong tháng này. MoneyNote sẽ gửi cảnh báo khi bạn chi tiêu gần đạt hoặc vượt hạn mức.
+                    </p>
+                    <div class="amount-input-group">
+                        <label for="budgetLimitInput">Hạn mức ngân sách (VND)</label>
+                        <div class="amount-box">
+                            <span class="amount-currency">₫</span>
+                            <input type="number" id="budgetLimitInput" class="amount-input" placeholder="0" min="0" step="50000" required>
+                        </div>
+                        <span class="form-error" id="budgetError">Hạn mức phải là số dương hoặc 0!</span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBudgetBtn">Hủy</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fa-solid fa-check"></i>
+                        <span>Lưu hạn mức</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL XÁC NHẬN XÓA GIAO DỊCH (F05) -->
+    <div class="modal-overlay" id="confirmDeleteModalOverlay" role="dialog" aria-modal="true">
+        <div class="modal-content confirm-box-content">
+            <div class="confirm-icon">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3>Xác nhận xóa giao dịch?</h3>
+            <p id="confirmDeleteMessage">Bạn có chắc chắn muốn xóa giao dịch này? Hành động này không thể hoàn tác.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" class="btn-secondary" id="cancelDeleteBtn">Không, giữ lại</button>
+                <button type="button" class="btn-primary" style="background-color: var(--color-expense);" id="confirmDeleteBtn">
+                    <i class="fa-solid fa-trash"></i> Đồng ý xóa
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KHUNG CHỨA TOAST THÔNG BÁO -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- JAVASCRIPT ĐIỀU KHIỂN CHÍNH (ES6+) -->
+    <script src="js/app.js"></script>
+</body>
+</html>
+
