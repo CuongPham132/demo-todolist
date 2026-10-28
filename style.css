@@ -1,0 +1,264 @@
+/* ==========================================================================
+   BIẾN DÙNG CHUNG TOÀN TRANG (COLOR & TYPOGRAPHY)
+   ========================================================================== */
+:root {
+  /* Bảng màu chuẩn theo mã HEX thiết kế */
+  --color-primary: #8b4513;        /* Nâu đầu trang & tên mục giá trị */
+  --color-text-dark: #2b2118;      /* Màu chữ chính & nền chân trang */
+  --color-title-dark: #5c2e0e;     /* Màu tiêu đề giới thiệu & giá trị */
+  --color-intro-bg: #e7d9c8;       /* Nền khối giới thiệu */
+  --color-page-bg: #fffaf3;        /* Nền toàn trang */
+  --color-white: #ffffff;          /* Màu trắng */
+  --color-focus: #ffbf47;          /* Màu viền tiêu điểm bàn phím tương phản cao */
+
+  /* Phông chữ & độ giãn dòng */
+  --font-family-base: Arial, Helvetica, sans-serif;
+  --line-height-base: 1.5;
+}
+
+/* ==========================================================================
+   RESET VÀ ĐỊNH DẠNG TOÀN TRANG
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px; /* Mốc chuẩn 1rem = 16px */
+}
+
+body {
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text-dark);
+  background-color: var(--color-page-bg);
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   BỐ CỤC CỘT GIỮA CĂN CHỈNH NỘI DUNG TỐI ĐA 720PX (45REM)
+   ========================================================================== */
+.content-wrapper {
+  width: 100%;
+  max-width: 45rem; /* 720px */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ==========================================================================
+   KHỐI ĐẦU TRANG & ĐIỀU HƯỚNG
+   ========================================================================== */
+.header-band {
+  background-color: var(--color-primary);
+  width: 100%;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 1rem 1.5rem; /* 16px trên dưới, 24px hai bên */
+  min-height: 4rem;      /* 64px ở màn hình nhỏ */
+}
+
+.brand-logo {
+  font-size: 1.5rem; /* 24px */
+  font-weight: bold;
+  color: var(--color-white);
+  text-decoration: none;
+  white-space: nowrap;
+  outline: none;
+  border-radius: 2px;
+}
+
+/* Trạng thái liên kết logo */
+.brand-logo:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.nav-bar {
+  margin-left: 2rem; /* Logo cách menu 32px (2rem) */
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 1rem; /* 4 mục menu cách nhau 16px (1rem) */
+}
+
+.nav-link {
+  font-size: 1rem; /* 16px */
+  color: var(--color-white);
+  text-decoration: none;
+  outline: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 2px;
+  position: relative;
+  transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+/* Hiệu ứng phản hồi rê chuột và tiêu điểm cho menu (không lệch bố cục) */
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  text-decoration: none;
+}
+
+.nav-link:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Nút menu 3 gạch cho di động */
+.menu-toggle {
+  display: none; /* Mặc định ẩn trên màn hình lớn */
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px; /* Ba gạch cách nhau 5px */
+  outline: none;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.menu-toggle .bar {
+  display: block;
+  width: 24px;
+  height: 3px;
+  background-color: var(--color-white);
+  border-radius: 1px;
+}
+
+.menu-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+.menu-toggle:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   KHỐI GIỚI THIỆU (CÂU CHUYỆN)
+   ========================================================================== */
+.intro-band {
+  background-color: var(--color-intro-bg);
+  width: 100%;
+}
+
+.intro-inner {
+  padding: 4rem 1.5rem; /* Đệm 64px trên dưới, 24px hai bên */
+}
+
+.intro-title {
+  font-size: 2.5rem; /* 40px */
+  line-height: var(--line-height-base);
+  color: var(--color-title-dark);
+  margin-bottom: 0.75rem; /* Cách đoạn mô tả 12px (0,75rem) */
+  font-weight: bold;
+}
+
+.intro-desc {
+  font-size: 1.125rem; /* 18px */
+  line-height: var(--line-height-base);
+  color: var(--color-text-dark);
+}
+
+/* ==========================================================================
+   KHỐI GIÁ TRỊ CỐT LÕI
+   ========================================================================== */
+.values-band {
+  width: 100%;
+}
+
+.values-inner {
+  padding-top: 3rem;       /* Đệm 48px phía trên */
+  padding-bottom: 3rem;    /* Từ chữ của mục cuối đến chân trang là 48px */
+  padding-left: 1.5rem;    /* 24px hai bên */
+  padding-right: 1.5rem;
+}
+
+.values-title {
+  font-size: 1.75rem; /* 28px */
+  line-height: var(--line-height-base);
+  color: var(--color-title-dark);
+  margin-bottom: 1.5rem; /* Cách danh sách 24px (1,5rem) */
+  font-weight: bold;
+}
+
+.values-list {
+  list-style: none; /* Không dấu đầu dòng */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;      /* Ba mục cách nhau 24px (1,5rem) */
+}
+
+.value-name {
+  font-size: 1.125rem; /* 18px */
+  line-height: var(--line-height-base);
+  color: var(--color-primary);
+  margin-bottom: 0.25rem; /* Cách đoạn mô tả 4px (0,25rem) */
+  font-weight: bold;
+}
+
+.value-desc {
+  font-size: 1rem; /* 16px */
+  line-height: var(--line-height-base);
+  color: var(--color-text-dark);
+}
+
+/* ==========================================================================
+   KHỐI CHÂN TRANG
+   ========================================================================== */
+.footer-band {
+  background-color: var(--color-text-dark); /* Nền #2b2118 */
+  width: 100%;
+}
+
+.footer-inner {
+  padding: 1.5rem 1.5rem; /* Đệm 24px */
+  text-align: center;     /* Chữ căn giữa */
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;           /* Hai dòng cách nhau 4px (0,25rem) */
+}
+
+.footer-line {
+  font-size: 0.875rem; /* 14px */
+  line-height: var(--line-height-base);
+  color: var(--color-white);
+}
+
+/* ==========================================================================
+   RESPONSIVE: DƯỚI 768PX (BAO GỒM CHUẨN 360PX)
+   ========================================================================== */
+@media (max-width: 767.98px) {
+  /* Ẩn danh sách liên kết điều hướng */
+  .nav-bar {
+    display: none;
+  }
+
+  /* Hiển thị nút menu ba gạch ở góc phải */
+  .menu-toggle {
+    display: flex;
+  }
+
+  .header-inner {
+    height: 64px;
+    padding-top: 0;
+    padding-bottom: 0;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem; /* Cách mép phải 24px */
+    justify-content: space-between;
+  }
+}
