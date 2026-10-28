@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Công Việc - Todo List</title>
+
+    <!-- Animate.css: load từ node_modules và fallback qua CDN nếu deploy GitHub Pages -->
+    <link rel="stylesheet" href="./node_modules/animate.css/animate.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+
+    <!-- CSS Giao diện chính -->
+    <link rel="stylesheet" href="todo-list.css">
+</head>
+<body>
+    <div class="container animate__animated animate__fadeIn">
+        <!-- Header -->
+        <header class="header">
+            <h1>📝 Quản Lý Công Việc</h1>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="taskInput" 
+                    placeholder="Nhập công việc mới..."
+                    autocomplete="off"
+                >
+                <button id="addBtn" class="btn-add">
+                    <span>Thêm</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Body - Task List -->
+        <main class="task-list" id="taskList">
+            <!-- Danh sách công việc sẽ được render động ở đây -->
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="task-counter">
+                <span id="completedCount">0</span> / <span id="totalCount">0</span> công việc hoàn thành
+            </div>
+            <div class="completion-status" id="completionStatus">
+                <!-- Badge 'Hoàn thành tất cả' sẽ hiển thị khi xong hết việc -->
+            </div>
+        </footer>
+    </div>
+
+    <!-- SweetAlert2: load từ node_modules kèm fallback CDN -->
+    <script src="./node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+    <script>
+        if (typeof Swal === 'undefined') {
+            document.write('<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"><\/script>');
+        }
+    </script>
+
+    <!-- JavaScript chính điều khiển logic Todo List -->
+    <script src="index.js"></script>
+</body>
+</html>
+
