@@ -475,10 +475,11 @@ function updateCategoryBreakdownChart() {
 // --- 9. CHỨC NĂNG F02 & F04: MODAL THÊM / SỬA GIAO DỊCH ---
 function openAddTxModal() {
     state.editingTxId = null;
+    state.selectedCategory = ''; // Reset danh mục đã chọn: Bắt buộc người dùng phải chủ động bấm chọn
     document.getElementById('txModalTitle').textContent = 'Thêm giao dịch mới';
     document.getElementById('saveTxBtn').innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>Lưu giao dịch</span>';
 
-    // Đặt lại form về mặc định
+    // Đặt lại form về mặc định (Khoản chi)
     setModalType('expense');
     document.getElementById('txAmount').value = '';
     document.getElementById('txDate').value = getTodayString();
@@ -495,21 +496,21 @@ function openEditTxModal(txId) {
     if (!tx) return;
 
     state.editingTxId = txId;
+    state.selectedCategory = tx.category; // Gán danh mục hiện tại của giao dịch
     document.getElementById('txModalTitle').textContent = 'Chỉnh sửa giao dịch';
     document.getElementById('saveTxBtn').innerHTML = '<i class="fa-solid fa-check"></i> <span>Cập nhật</span>';
 
-    setModalType(tx.type);
+    setModalType(tx.type, true); // true: Giữ nguyên danh mục khi chuyển loại
     document.getElementById('txAmount').value = tx.amount;
     document.getElementById('txDate').value = tx.date;
     document.getElementById('txPaymentMethod').value = tx.paymentMethod || 'Tiền mặt';
     document.getElementById('txNote').value = tx.note || '';
 
-    selectCategory(tx.category);
     clearFormErrors();
     openModal('txModalOverlay');
 }
 
-function setModalType(type) {
+function setModalType(type, preserveCategory = false) {
     state.currentType = type;
     const btnExpense = document.getElementById('btnTypeExpense');
     const btnIncome = document.getElementById('btnTypeIncome');
@@ -522,6 +523,14 @@ function setModalType(type) {
         btnIncome.className = 'type-toggle-btn active income';
     }
 
+    // Nếu người dùng chủ động chuyển tab Thu/Chi -> reset lựa chọn danh mục để tránh nhầm lẫn
+    if (!preserveCategory) {
+        state.selectedCategory = '';
+    }
+
+    // Ẩn thông báo lỗi danh mục cũ nếu có
+    document.getElementById('categoryError').style.display = 'none';
+
     renderCategoryGrid(type);
 }
 
@@ -530,11 +539,9 @@ function renderCategoryGrid(type) {
     const categories = type === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
 
     let html = '';
-    categories.forEach((cat, index) => {
-        const isSelected = (!state.selectedCategory && index === 0) || state.selectedCategory === cat.name;
-        if (!state.selectedCategory && index === 0) {
-            state.selectedCategory = cat.name;
-        }
+    categories.forEach(cat => {
+        // Chỉ đánh dấu selected nếu người dùng đã bấm chọn danh mục này
+        const isSelected = state.selectedCategory === cat.name;
 
         html += `
             <button type="button" class="category-option-btn ${isSelected ? 'selected' : ''}" onclick="selectCategory('${cat.name}')">
@@ -584,22 +591,39 @@ function handleSaveTransaction(e) {
 
     let hasError = false;
 
-    // Validate số tiền
+    // 1. Validate số tiền: Không để trống, > 0, là số nguyên, không quá 10 tỷ
     if (!amount || amount <= 0 || isNaN(amount)) {
+        document.getElementById('amountError').textContent = 'Vui lòng nhập số tiền hợp lệ lớn hơn 0!';
+        document.getElementById('amountError').style.display = 'block';
+        amountInput.focus();
+        hasError = true;
+    } else if (!Number.isInteger(amount)) {
+        document.getElementById('amountError').textContent = 'Số tiền VND phải là số nguyên (không có số lẻ thập phân)!';
+        document.getElementById('amountError').style.display = 'block';
+        amountInput.focus();
+        hasError = true;
+    } else if (amount > 10000000000) {
+        document.getElementById('amountError').textContent = 'Số tiền giao dịch không được vượt quá 10 tỷ đồng!';
         document.getElementById('amountError').style.display = 'block';
         amountInput.focus();
         hasError = true;
     }
 
-    // Validate danh mục
-    if (!state.selectedCategory) {
+    // 2. Validate danh mục: Bắt buộc người dùng phải chọn VÀ danh mục phải thuộc loại Thu/Chi tương ứng
+    const validCategories = state.currentType === 'income' ? INCOME_CATEGORIES : EXPENSE_CATEGORIES;
+    const isValidCategory = state.selectedCategory && validCategories.some(c => c.name === state.selectedCategory);
+
+    if (!isValidCategory) {
+        document.getElementById('categoryError').textContent = 'Vui lòng bấm chọn một danh mục trong danh sách!';
         document.getElementById('categoryError').style.display = 'block';
         hasError = true;
     }
 
-    // Validate ngày
+    // 3. Validate ngày: Bắt buộc chọn ngày hợp lệ
     if (!date) {
+        document.getElementById('dateError').textContent = 'Vui lòng chọn ngày giao dịch hợp lệ!';
         document.getElementById('dateError').style.display = 'block';
+        if (!hasError) dateInput.focus();
         hasError = true;
     }
 
@@ -884,6 +908,14 @@ function initApp() {
     document.getElementById('closeTxModalBtn').addEventListener('click', () => closeModal('txModalOverlay'));
     document.getElementById('cancelTxBtn').addEventListener('click', () => closeModal('txModalOverlay'));
     document.getElementById('txForm').addEventListener('submit', handleSaveTransaction);
+
+    // Xóa thông báo lỗi form theo thời gian thực (Real-time error clear)
+    document.getElementById('txAmount').addEventListener('input', () => {
+        document.getElementById('amountError').style.display = 'none';
+    });
+    document.getElementById('txDate').addEventListener('input', () => {
+        document.getElementById('dateError').style.display = 'none';
+    });
 
     // Nút chuyển loại Thu / Chi trong Modal
     document.getElementById('btnTypeExpense').addEventListener('click', () => setModalType('expense'));
